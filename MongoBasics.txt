@@ -1,0 +1,36 @@
+mongodb		sql
+Documento | tupla o registro
+coleccion | tabla
+-------------------------------------
+facil cambio de esquema en produccion
+se piensa la escala en forma horizontal
+replicacion de datos
+JavaScript en servidor
+
+
+------------INSERT-----------------------
+document ={atributo : "value", atributo2 : "value2"}
+db.collection.insert(document)
+
+********Documento************
+usuario ={nombre: "Test", edad: 21}
+********Documento************
+db.usuarios.insert(usuario)
+//Colleccion no existe es creada por mongo al insertar
+ db.usuarios.find()
+//mostrar los documentos de la colleccion usuarios
+
+
+
+--------------WHERE--------------------------------
+var comando = db.collection.findOne()
+//encuentra un solo documento, se puede almacenar el comando en una variable tipo javascript
+db.collection.find ( { atributo: "value" , atributo2: "value2"} )
+db.usuarios.find ( { nombre:"Test" } ) // where de un campo
+db.usuarios.find ( { _id: ObjectId ("5cb6bd2e004d4010c8190cd7") } ) //where con objectId
+db.usuarios.find( { nombre: "Test", edad: 21} )   / / where con and 2 campos o mas
+//buscar documentos con condicion condiciones se ponen entre llaves { }
+
+---------------------Where not---------------------
+db.collection.find ( {atributo: {$ne: ValueToExclude } } ) 
+db.usuarios.find( {nombre:{$ne: "Test"} } ) //encuentra todos los documentos menos el que el campo nombre es Test
