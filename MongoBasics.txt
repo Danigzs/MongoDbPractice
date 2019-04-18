@@ -34,3 +34,29 @@ db.usuarios.find( { nombre: "Test", edad: 21} )   / / where con and 2 campos o m
 ---------------------Where not---------------------
 db.collection.find ( {atributo: {$ne: ValueToExclude } } ) 
 db.usuarios.find( {nombre:{$ne: "Test"} } ) //encuentra todos los documentos menos el que el campo nombre es Test
+
+
+--------------UPDATE-----------------------------------------------------
+ db.usuarios.insert( [uno, dos ] ) //inserta 2 documentos o mas dando como parametro un array con los nombres de los documentos
+
+var test = db.usuarios.findOne( {nombre: "Test dos" } )//busca campo nombre con el registro test dos
+test.nombre// muestra el nombre "Test dos"
+test.nombre = "NOMBRE NUEVO" // empezamos update
+db.usuarios.save( document )// guarda el update si el documento no tiene id crea uno nuevo y lo inserta
+db.usuarios.save( test )// hace el update al documento test
+//se pueden agregar atributos nuevos por ejemplo si test no tiene el atributo edad
+test.edad = "24"// agrega el atributo pero no lo guarda aun
+db.usuarios.update( { nombre: "NOMBRE NUEVO" }, test ) // hace el update al documento que tiene el nombre "NOMBRE NUEVO" agregando el campo edad
+
+
+db.usuarios.update( {nombre:"Test" }, {$set: {nombre:"CF"} } ) // donde el nombre sea "Test actualiza el nombre a "CF" pero solo en uno
+db.usuarios.update( {nombre:"Test" }, {$set: {nombre:"CF"} } ,{multi: true} ) // en todos los documentos donde el nombre sea "Test" actualiza el nombre a "CF"
+db.usuarios.update( {nombre:"Test" }, {$unset: {nombre:"CF"} } ,{multi: true} ) // con unset se pueden eliminar campos
+
+
+
+----------------------------------------------REMOVE----------------------------------------------------
+db.coleccion.remove( { Condicion } )//Remueve los documentos que cumplan la condicion
+db.coleccion.remove( { } )// Sin condicion remueve todos los documentos
+db.coleccion.drop() //Elimina la coleccion completa
+db.dropDataBase()//Elimina la base de datos
