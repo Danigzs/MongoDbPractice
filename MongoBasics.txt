@@ -17,7 +17,8 @@ usuario ={nombre: "Test", edad: 21}
 ********Documento************
 db.usuarios.insert(usuario)
 //Colleccion no existe es creada por mongo al insertar
- db.usuarios.find()
+ db.usuarios.find().pretty()
+db.usuarios.find( { condicion vacia } { campo:1, campo2:1 }  )//con "1" muestra solo ese campo o los campos que queramos
 //mostrar los documentos de la colleccion usuarios
 
 
@@ -34,6 +35,7 @@ db.usuarios.find( { nombre: "Test", edad: 21} )   / / where con and 2 campos o m
 ---------------------Where not---------------------
 db.collection.find ( {atributo: {$ne: ValueToExclude } } ) 
 db.usuarios.find( {nombre:{$ne: "Test"} } ) //encuentra todos los documentos menos el que el campo nombre es Test
+db.usuarios.find({nombre:"Test", edad:{$ne:23}})// ejemplo con mas campos
 
 
 --------------UPDATE-----------------------------------------------------
@@ -59,4 +61,63 @@ db.usuarios.update( {nombre:"Test" }, {$unset: {nombre:"CF"} } ,{multi: true} ) 
 db.coleccion.remove( { Condicion } )//Remueve los documentos que cumplan la condicion
 db.coleccion.remove( { } )// Sin condicion remueve todos los documentos
 db.coleccion.drop() //Elimina la coleccion completa
-db.dropDataBase()//Elimina la base de datos
+db.dropDatabase()//Elimina la base de datos
+
+
+
+
+
+-----------------------------------------------Between------------------------------------------------------
+db.usuarios.find( { condicion vacia } { campo:1, campo2:1, _id:0 }  )//con "1" muestra solo ese campo o los campos que queramos, con "0" se quita el campo que no quieres mostrar
+Operadores
+$gt  > greater than
+$gte >= greate than equals
+$lt < less than
+$lte <= less than equals
+
+
+
+
+-----------------------------------------------CURSORES---------------------------------------------------
+for(i=0; i<100; i++){db.test.insert({valor:i})}
+
+//find regresa un cursor
+var cursor = db.test.find() // variable cursor solo muestra los documentos una vez
+cursor.forEach( function(d){ print(d) } ) // for each arroja en bson
+cursor.forEach( function(d){ print(d.valor) } )//for each arroja el campo valor de los documentos
+cursor.forEach( function(d) { d.valor = 100; db.test.save(d); } ) //recorre cambiando los valores a 100 y guardandolos
+
+
+
+
+----------------------------------------------METODOS DE CURSORES--------------------------------
+db.test.find().count() // cuenta cuantos documentos hay en la coleccion, se pueden agregar condicionales
+db.test.find().sort(valor:-1)// ordena de mayor a menor
+db.test.find().sort(valor:1)// ordena de menor a mayor
+db.test.find().sort(valor:-1).limit(3)// metodo limit recibe como parametro un numero en este caso 3 y muestra los primeros 3
+db.test.find().sort(valor:-1).skip(1).limit(2)// metodo skip se salta el primero y muestra los siguientes 2
+db.test.find().sort(valor:-1).skip(1).limit(2).size()// metodo size para saber cuantos documentos regresa en este caso si se usa el metodo count cuenta todos los de la coleccion
+
+
+
+-----------------------------------------Arreglos-------------------------------------------------------
+var arreglo =[1,2,3]
+var usuario = { nombre: "test", valores: arreglo} // se agrega el arreglo al campo valores
+db.usuarios.insert(usuario) // inserta documento con campos nombre y valores
+db.usuarios.update( {} , {$addToSet: { valores: 4} } ) 
+// con addToSet se agrega el 4 al arreglo quedaria valores[1.2.3.4] si se vuelve a escribir esta linea con el mismo valor a agregar no agrega el nuevo elemento
+db.usuarios.update( {} , {$push: { valores: 4} } ) //con push agrega el elemento a valores aunque ya exista el 4 el arreglo quedaria [1,2,3,4,4]
+db.usuarios.update( {} , {$push: { valores: { $each:[5,6] } } } )
+// si se quiere agregar mas de un elemento al arreglo se hace con la palabra reservada each con esta linea la salida del arreglo seria [1,2,3,4,4,5,6]
+db.usuarios.update( {} , {$push: { valores: { $each:[18,25] ,$position:4} } } )
+// con la palabra reservada position se elige en que posicion agregar los elementos el arreglo quedaria [ 1, 2, 3, 4, 18, 25, 4, 5, 6 ]
+
+
+
+11:17 p. m. 18/04/2019
+
+----------------------------------Delete arreglos-----------------------------------------------------
+se sigue usando el arreglo [ 1, 2, 3, 4, 18, 25, 4, 5, 6 ]
+db.usuarios.update( { },{ $pull :{ valores:6 } } )// con pull elimina un elemento en este caso quedaria el arreglo [ 1, 2, 3, 4, 18, 25, 4, 5 ]
+db.usuarios.update( { },{ $pull :{ valores:{$gte:18} } } )// de esta forma se pueden usar condicionales pero con pull solo elimina un elemento
+db.usuarios.update( { },{ $pullAll :{ valores:[ 1,2,3 ] } } } )// con pullAll elimina multiples elementos
